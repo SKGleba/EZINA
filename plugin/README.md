@@ -1,1 +1,1 @@
-Plugin used by EZINA, credits to TheFlow and motoharu
+Plugin used by EZINA, credits to TheFlow, zecoxao and motoharu
