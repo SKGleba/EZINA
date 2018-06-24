@@ -1,5 +1,5 @@
 /*
-	INARW plugin v1.1
+	INARW plugin v2.0
 	By SKGleba
 */
 /*
@@ -27,6 +27,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <unistd.h>
 
 #include <taihen.h>
 
@@ -63,8 +66,21 @@ static SceIoMountPoint *(* sceIoFindMountPoint)(int id) = NULL;
 
 static SceIoDevice *ori_dev = NULL, *ori_dev2 = NULL;
 
+int exists(const char* filloc) {
+  SceUID fd;
+  fd = ksceIoOpen(filloc, SCE_O_RDONLY, 0);
+  if (fd < 0) {
+ksceIoClose(fd);
+return 0;
+  }
+ksceIoClose(fd);
+return 1;
+}
+
 void _start() __attribute__ ((weak, alias("module_start")));
 int module_start(SceSize args, void *argp) {
+	ksceIoMkdir("ux0:ndp/", 6);
+if (exists("ur0:temp/inagrw") == 1) {
 // redirect based on theflow's
 	tai_module_info_t info;
 	info.size = sizeof(tai_module_info_t);
@@ -82,7 +98,75 @@ int module_start(SceSize args, void *argp) {
 	ksceIoUmount(0xA00, 0, 0, 0);
 	ksceIoUmount(0xA00, 1, 0, 0);
 	ksceIoMount(0xA00, NULL, 0, 0, 0, 0);
+	ksceIoRemove("ur0:temp/inagrw");
+}
+// dump wae based on zecoxao's nand dumper
+if (exists("ur0:temp/dinaos") == 1){
 
+	SceUID fd = ksceIoOpen("sdstor0:int-lp-ina-os", SCE_O_RDONLY, 0777);
+	SceUID wfd = ksceIoOpen("ux0:ndp/os0_ina", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
+	static char buffer[0x4000];
+	unsigned int i = 0;
+	for(i=0;i<0x1000000;i=i+0x4000){
+		ksceIoRead(fd, buffer, 0x4000);
+		ksceIoWrite(wfd, buffer, 0x4000);
+	}
+	if (fd > 0)
+		ksceIoClose(fd);
+	if (wfd > 0)
+		ksceIoClose(wfd);
+	ksceIoRemove("ur0:temp/dinaos");
+}
+/*
+// Used in another project
+if (exists("ur0:temp/dactos") == 1){
+
+	SceUID fd = ksceIoOpen("sdstor0:int-lp-act-os", SCE_O_RDONLY, 0777);
+	SceUID wfd = ksceIoOpen("ux0:ndp/os0_act", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
+	static char buffer[0x4000];
+	unsigned int i = 0;
+	for(i=0;i<0x1000000;i=i+0x4000){
+		ksceIoRead(fd, buffer, 0x4000);
+		ksceIoWrite(wfd, buffer, 0x4000);
+	}
+	if (fd > 0)
+		ksceIoClose(fd);
+	if (wfd > 0)
+		ksceIoClose(wfd);
+	ksceIoRemove("ur0:temp/dactos");
+}
+if (exists("ur0:temp/dignvs") == 1){
+
+	SceUID fd = ksceIoOpen("sdstor0:int-lp-ign-vsh", SCE_O_RDONLY, 0777);
+	SceUID wfd = ksceIoOpen("ux0:ndp/vs0", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
+	static char buffer[0x4000];
+	unsigned int i = 0;
+	for(i=0;i<0x10000000;i=i+0x4000){
+		ksceIoRead(fd, buffer, 0x4000);
+		ksceIoWrite(wfd, buffer, 0x4000);
+	}
+	if (fd > 0)
+		ksceIoClose(fd);
+	if (wfd > 0)
+		ksceIoClose(wfd);
+	ksceIoRemove("ur0:temp/dignvs");
+}
+*/
+if (exists("ur0:temp/dfnand") == 1){
+	SceUID fd = ksceIoOpen("sdstor0:int-lp-act-entire", SCE_O_RDONLY, 0777);
+	SceUID wfd = ksceIoOpen("ux0:ndp/nand.bin", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
+	static char buffer[0x4000];
+	unsigned int i = 0;
+	for(i=0;i<0xE1400000;i=i+0x4000){
+		ksceIoRead(fd, buffer, 0x4000);
+		ksceIoWrite(wfd, buffer, 0x4000);
+	}
+	if (fd > 0)
+		ksceIoClose(fd);
+	if (wfd > 0)
+		ksceIoClose(wfd);
+	ksceIoRemove("ur0:temp/dfnand");
+}
 	return SCE_KERNEL_START_SUCCESS;
 }
 
