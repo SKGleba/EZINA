@@ -1,5 +1,5 @@
 /* 
- EZINA v2.0
+ EZINA v2.01
  By SKGleba
 */
 #include <stdio.h>
@@ -13,12 +13,6 @@
 #include <taihen.h>
 #include "graphics.h"
 #define MOD_PATH "ux0:app/SKGINARW0/sce_sys/dic0.png"
-/*
-// Used in another project
-char menu_items[][100] = {" -> Mount inactive os0 as grw0:"," -> Dump inactive os0"," -> Dump active os0"," -> Dump vs0"," -> Dump whole NAND"," -> Exit"};
-int item_count = 6;
-*/
-// In inarw/ezina we use this:
 char menu_items[][50] = {" -> Mount inactive os0 as grw0:"," -> Dump inactive os0"," -> Dump whole NAND"," -> Exit"};
 int item_count = 4;
 
@@ -119,28 +113,6 @@ int main()
 
 			if (pad.buttons == SCE_CTRL_CROSS) {
 				switch (selected){
-/*
-// Used in another project
-					case 0:
-							callkp("ur0:temp/inagrw");
-					break;
-					case 1:
-							callkp("ur0:temp/dinaos");
-					break;
-					case 2:
-							callkp("ur0:temp/dactos");
-					break;
-					case 3:
-							callkp("ur0:temp/dignvs");
-					break;
-					case 4:
-							callkp("ur0:temp/dfnand");
-					break;
-					case 5:
-								sceKernelExitProcess(0);
-					break;
-*/
-// In inarw/ezina we use this:
 					case 0:
 							callkp("ur0:temp/inagrw");
 					break;
