@@ -2,7 +2,7 @@ inarw:
   attributes: 0
   version:
     major: 2
-    minor: 0
+    minor: 5
   main:
     start: module_start
     stop: module_stop
