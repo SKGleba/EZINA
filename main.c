@@ -1,5 +1,5 @@
 /* 
- EZINA v2.01
+ EZINA v2.5
  By SKGleba
 */
 #include <stdio.h>
@@ -56,7 +56,7 @@ int exists(const char *fname) {
 void select_menu(){
 	psvDebugScreenClear(COLOR_BLACK);
 	psvDebugScreenSetFgColor(COLOR_GREEN);
-	psvDebugScreenPrintf("                       EZINA v2 fw3.60                           \n");
+	psvDebugScreenPrintf("                         EZINA v2.5                              \n");
 	psvDebugScreenPrintf("                         By SKGleba                              \n");
 			psvDebugScreenSetFgColor(COLOR_RED);
 	for(i = 0; i < item_count; i++){
@@ -86,6 +86,7 @@ psvDebugScreenPrintf("Working...\n");
 if (mod_id < 0){ psvDebugScreenPrintf("KERNEL ERROR!\n"); sceKernelDelayThread(5 * 1000 * 1000); sceKernelExitProcess(0);}
 if (exists(cfgn) == 1){ psvDebugScreenPrintf("FAILED: WEIRD ADRESS\n"); sceKernelDelayThread(5 * 1000 * 1000); sceKernelExitProcess(0);}
 psvDebugScreenPrintf("Success...\n");
+if (exists("grw0:psp2bootconfig.skprx") == 0){
 psvDebugScreenPrintf("Stopping kmodule...\n");
 		argg.size = sizeof(argg);
 		argg.pid = KERNEL_PID;
@@ -93,7 +94,7 @@ psvDebugScreenPrintf("Stopping kmodule...\n");
 		argg.argp = NULL;
 		argg.flags = 0;
 		taiStopUnloadKernelModuleForUser(mod_id, &argg, NULL, NULL);
-psvDebugScreenPrintf("Success...\n");
+psvDebugScreenPrintf("Success...\n");}
 return 1;
 }
 
@@ -122,7 +123,7 @@ int main()
 					case 2:
 							callkp("ur0:temp/dfnand");
 					break;
-					case 4:
+					case 3:
 								sceKernelExitProcess(0);
 					break;
 				}
