@@ -1,5 +1,5 @@
 /*
-	INARW plugin v2.5
+	INARW plugin v3
 	By SKGleba
 */
 /*
@@ -15,7 +15,6 @@
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
-
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -32,36 +31,6 @@
 #include <unistd.h>
 
 #include <taihen.h>
-
-// by molecule
-int run_on_thread(void *func) {
-	int ret = 0;
-	int res = 0;
-	int uid = 0;
-
-	ret = uid = ksceKernelCreateThread("run_on_thread", func, 64, 0x10000, 0, 0, 0);
-
-	if (ret < 0) {
-		ret = -1;
-		goto cleanup;
-	}
-	if ((ret = ksceKernelStartThread(uid, 0, NULL)) < 0) {
-		ret = -1;
-		goto cleanup;
-	}
-	if ((ret = ksceKernelWaitThreadEnd(uid, &res, NULL)) < 0) {
-		ret = -1;
-		goto cleanup;
-	}
-
-	ret = res;
-
-cleanup:
-	if (uid > 0)
-		ksceKernelDeleteThread(uid);
-
-	return ret;
-}
 
 int module_get_offset(SceUID pid, SceUID modid, int segidx, size_t offset, uintptr_t *addr);
 
@@ -96,65 +65,8 @@ static SceIoMountPoint *(* sceIoFindMountPoint)(int id) = NULL;
 
 static SceIoDevice *ori_dev = NULL, *ori_dev2 = NULL;
 
-int exists(const char* filloc) {
-  SceUID fd;
-  fd = ksceIoOpen(filloc, SCE_O_RDONLY, 0);
-  if (fd < 0) {
-ksceIoClose(fd);
-return 0;
-  }
-ksceIoClose(fd);
-return 1;
-}
-
-int dump(void) {
-// dump wae based on zecoxao's nand dumper
-if (exists("ur0:temp/dinaos") == 1){
-
-	SceUID fd = ksceIoOpen("sdstor0:int-lp-ina-os", SCE_O_RDONLY, 0777);
-	SceUID wfd = ksceIoOpen("ux0:ndp/os0_ina", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
-	static char buffer[0x4000];
-	unsigned int i = 0;
-	for(i=0;i<0x1000000;i=i+0x4000){
-		ksceIoRead(fd, buffer, 0x4000);
-		ksceIoWrite(wfd, buffer, 0x4000);
-	}
-	if (fd > 0)
-		ksceIoClose(fd);
-	if (wfd > 0)
-		ksceIoClose(wfd);
-	ksceIoRemove("ur0:temp/dinaos");
-}
-if (exists("ur0:temp/dfnand") == 1){
-	SceUID fd = ksceIoOpen("sdstor0:int-lp-act-entire", SCE_O_RDONLY, 0777);
-	SceUID wfd = ksceIoOpen("ux0:ndp/nand.bin", SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND, 6);
-	static char buffer[0x4000];
-	unsigned int i = 0;
-
-	for(i=0;i<0xE3400000;i=i+0x4000){
-		ksceIoRead(fd, buffer, 0x4000);
-		ksceIoWrite(wfd, buffer, 0x4000);
-	}
-	if (fd > 0)
-		ksceIoClose(fd);
-	if (wfd > 0)
-		ksceIoClose(wfd);
-	ksceIoRemove("ur0:temp/dfnand");
-}
-}
-int pdump(void){
-	int ret = 0;
-	int state = 0;
-
-	ENTER_SYSCALL(state);
-	ret = run_on_thread(dump);
-	EXIT_SYSCALL(state);
-return ret;
-}
 void _start() __attribute__ ((weak, alias("module_start")));
 int module_start(SceSize args, void *argp) {
-	ksceIoMkdir("ux0:ndp/", 6);
-if (exists("ur0:temp/inagrw") == 1) {
 // redirect based on theflow's
 	tai_module_info_t info;
 	info.size = sizeof(tai_module_info_t);
@@ -187,9 +99,6 @@ if (exists("ur0:temp/inagrw") == 1) {
 	ksceIoUmount(0xA00, 0, 0, 0);
 	ksceIoUmount(0xA00, 1, 0, 0);
 	ksceIoMount(0xA00, NULL, 0, 0, 0, 0);
-	ksceIoRemove("ur0:temp/inagrw");
-}
-pdump();
 	return SCE_KERNEL_START_SUCCESS;
 }
 

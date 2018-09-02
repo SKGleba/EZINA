@@ -2,7 +2,7 @@ TARGET=EZINA
 TITLE_ID=SKGINARW0
 OBJS   = main.o font.o graphics.o
 
-LIBS = -lSceCtrl_stub -ltaihen_stub -lSceDisplay_stub -lScePower_stub -lSceVshBridge_stub -lSceMtpIfDriver_stub -lSceAppMgr_stub
+LIBS = -lSceCtrl_stub -ltaihen_stub -lSceDisplay_stub -lScePower_stub -lSceVshBridge_stub -lSceMtpIfDriver_stub -lSceAppMgr_stub -lkndp_stub
 
 PREFIX  = arm-vita-eabi
 CC      = $(PREFIX)-gcc
@@ -14,6 +14,7 @@ all: $(TARGET).vpk
 %.vpk: eboot.bin
 	vita-mksfoex -s TITLE_ID=$(TITLE_ID) "EZINA" param.sfo
 	vita-pack-vpk -s param.sfo -b eboot.bin \
+    -a kndp/kndp.skprx=kndp.skprx \
     -a plugin/inarw.skprx=sce_sys/dic0.png \$@
 
 eboot.bin: $(TARGET).velf
